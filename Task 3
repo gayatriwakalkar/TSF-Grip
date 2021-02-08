@@ -1,0 +1,51 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from IPython.display import Image
+from sklearn.tree import export_graphviz 
+import sklearn.datasets as datasets
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, accuracy_score, confusion_matrix 
+iris = datasets.load_iris()
+data= pd.DataFrame(iris.data, columns = iris.feature_names)
+y = iris.target
+y = pd.DataFrame(y,columns=["Target"])
+df = pd.concat([data,y],axis=1)
+df.head()
+df.tail()
+df.shape
+df.columns
+df.info()
+df.dtypes
+df.isnull().sum()
+df.describe()
+sns.pairplot(df,hue="Target")
+sns.distplot(df["sepal length (cm)"])
+sns.distplot(df["sepal width (cm)"])
+sns.distplot(df["petal length (cm)"])
+sns.distplot(df["petal width (cm)"])
+sns.pairplot(df,diag_kind='kde')
+plt.figure(figsize=[10,8])
+df.plot(kind="box",subplots=True,sharey=False,sharex=False,layout=(2,3))
+plt.xticks(rotation=90)
+plt.show()
+plt.tight_layout()
+plt.figure(figsize=[10,8])
+sns.heatmap(df.corr(),annot=True) #to check correlation
+plt.title("Heatmap")
+plt.show()
+x = df.drop("Target",axis=1)
+y = df.Target
+xtrain,xtest,ytrain,ytest = train_test_split(x,y,random_state=123,test_size=0.2)
+dt=DecisionTreeClassifier(random_state=123)
+dt_fit=dt.fit(xtrain,ytrain)
+dt_predict = dt_fit.predict(xtest)
+sns.heatmap(confusion_matrix(ytest,dt_predict),annot=True)
+classificationreport = classification_report(ytest,dt_predict)
+print("classification report is:",classificationreport)
+accuracy = accuracy_score(ytest,dt_predict)
+print("Accuracy score is:",accuracy)
+export_graphviz(dt_fit,out_file='tree.dot',feature_names=iris.feature_names, filled=True, rounded=True,special_characters=True)
+Image(filename='pkc.png')
